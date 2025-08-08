@@ -1,0 +1,36 @@
+---
+name: Lint
+
+on: # yamllint disable-line rule:truthy
+  pull_request: null
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required to get full git history
+
+      - name: Super-linter
+        uses: super-linter/super-linter/slim@v8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # To report status checks
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_MARKDOWN_PRETTIER: false
+          VALIDATE_YAML_PRETTIER: false
